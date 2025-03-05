@@ -1,10 +1,12 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { AppContext } from "../App";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { setPromptShown } = useContext(AppContext);
   const [activeSection, setActiveSection] = useState(0);
   const totalSections = 3;
 
@@ -19,6 +21,8 @@ const Index = () => {
   }, [activeSection]);
 
   const handleNext = () => {
+    // Reset promptShown to false so it will appear on the select-type page
+    setPromptShown(false);
     navigate("/select-type");
   };
 

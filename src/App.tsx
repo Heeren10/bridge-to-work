@@ -25,6 +25,7 @@ export const AppContext = createContext<{
 const queryClient = new QueryClient();
 
 const App = () => {
+  // We're resetting promptShown to false by default so it shows again when clicking Get Started
   const [promptShown, setPromptShown] = useState(false);
 
   return (

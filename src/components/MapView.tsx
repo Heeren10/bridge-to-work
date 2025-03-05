@@ -13,9 +13,6 @@ interface MapViewProps {
 const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   
-  // In a real app, this would use a mapping library like Mapbox or Google Maps
-  // For now, we'll create a simple visual representation
-
   useEffect(() => {
     // This would be where we'd initialize the map and markers
     // For this demo, we'll just use a visual representation
@@ -25,15 +22,13 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
 
   return (
     <div className="rounded-lg overflow-hidden h-full relative bg-gray-100 border border-border">
-      {/* Placeholder map */}
-      <div ref={mapRef} className="h-full bg-[#e6e9ef] relative">
-        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-          <div className="h-[80%] w-[80%] rounded-full border-4 border-gray-300 flex items-center justify-center">
-            <div className="h-[60%] w-[60%] rounded-full border-4 border-gray-300 flex items-center justify-center">
-              <div className="h-[40%] w-[40%] rounded-full border-4 border-gray-300"></div>
-            </div>
-          </div>
-        </div>
+      {/* Map background with streets pattern */}
+      <div ref={mapRef} className="h-full bg-[#e6e9ef] relative" 
+           style={{
+             backgroundImage: "url('https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/0,0,10,0,0/800x600?access_token=pk.eyJ1IjoicHVibGljLXRva2VuIiwiYSI6ImNsbjZ1NXZ0dDB4ZW4ya3BqZmU0NmdoNWcifQ.03uqD1Bzbd_-4G7YNrXrwQ')",
+             backgroundSize: "cover",
+             backgroundPosition: "center"
+           }}>
         
         {/* Simulated pins for locations */}
         {items.map((item, index) => {

@@ -7,7 +7,7 @@ interface WelcomePromptProps {
 }
 
 const WelcomePrompt = ({ 
-  message = "Let's say no to cash handouts and yes to sustainable help. Refer someone to work opportunities or support services instead." 
+  message = "Say no to Cash, Direct them" 
 }: WelcomePromptProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
