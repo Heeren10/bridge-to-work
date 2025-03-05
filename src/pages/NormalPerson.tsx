@@ -8,6 +8,7 @@ import JobCard, { JobData } from "../components/JobCard";
 import NGOCard, { NGOData } from "../components/NGOCard";
 import BackButton from "../components/BackButton";
 import ReferModal from "../components/ReferModal";
+import MapView from "../components/MapView";
 
 // Fake data for demonstration
 const JOBS_DATA: JobData[] = [
@@ -102,6 +103,7 @@ const NormalPerson = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>({});
   const [referItem, setReferItem] = useState<{ item: any; type: "job" | "ngo" } | null>(null);
+  const [activeTab, setActiveTab] = useState<"jobs" | "services">("jobs");
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -121,7 +123,7 @@ const NormalPerson = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header title="Find Opportunities" />
       
-      <main className="flex-1 container-padding max-w-screen-md mx-auto">
+      <main className="flex-1 container max-w-screen-xl mx-auto p-4">
         <div className="mb-6">
           <BackButton to="/select-type" />
         </div>
@@ -130,52 +132,66 @@ const NormalPerson = () => {
           <SearchFilter onSearch={handleSearch} onFilter={handleFilter} />
         </div>
         
-        <Tabs defaultValue="jobs" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="jobs" className="flex items-center gap-2">
-              <Briefcase size={16} />
-              <span>Jobs</span>
-            </TabsTrigger>
-            <TabsTrigger value="services" className="flex items-center gap-2">
-              <Building size={16} />
-              <span>Services</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-240px)]">
+          {/* Left column - Opportunities list */}
+          <div className="lg:col-span-2 overflow-auto pr-2">
+            <Tabs 
+              defaultValue="jobs" 
+              className="w-full"
+              onValueChange={(value) => setActiveTab(value as "jobs" | "services")}
+            >
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="jobs" className="flex items-center gap-2">
+                  <Briefcase size={16} />
+                  <span>Jobs</span>
+                </TabsTrigger>
+                <TabsTrigger value="services" className="flex items-center gap-2">
+                  <Building size={16} />
+                  <span>Services</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="jobs" className="space-y-4 animate-fade-in">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin size={16} className="text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Showing opportunities near you</span>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {JOBS_DATA.map(job => (
+                    <JobCard 
+                      key={job.id} 
+                      job={job}
+                      onRefer={() => handleRefer(job, "job")}
+                    />
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="services" className="space-y-4 animate-fade-in">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin size={16} className="text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Showing services near you</span>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {NGOS_DATA.map(ngo => (
+                    <NGOCard 
+                      key={ngo.id} 
+                      ngo={ngo}
+                      onRefer={() => handleRefer(ngo, "ngo")}
+                    />
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
           
-          <TabsContent value="jobs" className="space-y-4 animate-fade-in">
-            <div className="flex items-center gap-2 mb-4">
-              <MapPin size={16} className="text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Showing opportunities near you</span>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              {JOBS_DATA.map(job => (
-                <JobCard 
-                  key={job.id} 
-                  job={job}
-                  onRefer={() => handleRefer(job, "job")}
-                />
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="services" className="space-y-4 animate-fade-in">
-            <div className="flex items-center gap-2 mb-4">
-              <MapPin size={16} className="text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Showing services near you</span>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              {NGOS_DATA.map(ngo => (
-                <NGOCard 
-                  key={ngo.id} 
-                  ngo={ngo}
-                  onRefer={() => handleRefer(ngo, "ngo")}
-                />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+          {/* Right column - Map */}
+          <div className="lg:col-span-3 hidden lg:block">
+            <MapView jobs={JOBS_DATA} ngos={NGOS_DATA} activeType={activeTab} />
+          </div>
+        </div>
       </main>
       
       {referItem && (
