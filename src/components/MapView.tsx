@@ -14,40 +14,48 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // This would be where we'd initialize the map and markers
-    // For this demo, we'll just use a visual representation
+    // This would be where we'd initialize an interactive map 
+    // For this demo, we're using a static image
   }, [jobs, ngos, activeType]);
 
   const items = activeType === "jobs" ? jobs : ngos;
 
   return (
     <div className="rounded-lg overflow-hidden h-full relative bg-gray-100 border border-border">
-      {/* Map background with streets pattern */}
-      <div ref={mapRef} className="h-full bg-[#e6e9ef] relative" 
-           style={{
-             backgroundImage: "url('https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/0,0,10,0,0/800x600?access_token=pk.eyJ1IjoicHVibGljLXRva2VuIiwiYSI6ImNsbjZ1NXZ0dDB4ZW4ya3BqZmU0NmdoNWcifQ.03uqD1Bzbd_-4G7YNrXrwQ')",
-             backgroundSize: "cover",
-             backgroundPosition: "center"
-           }}>
+      {/* Map background with real street map */}
+      <div 
+        ref={mapRef} 
+        className="h-full relative" 
+        style={{
+          backgroundImage: "url('/lovable-uploads/9e3eca6c-5ff1-4aa1-97b6-8a64c0a0eb34.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
         
-        {/* Simulated pins for locations */}
+        {/* Pins for locations */}
         {items.map((item, index) => {
-          // Generate random positions for demo
-          const top = 20 + Math.random() * 60;
-          const left = 20 + Math.random() * 60;
+          // Generate positions for demo that look more realistic on the map
+          const top = 15 + Math.random() * 70;
+          const left = 15 + Math.random() * 70;
           const isJob = activeType === "jobs";
           const label = isJob ? (item as JobData).title : (item as NGOData).name;
           const location = isJob ? (item as JobData).location : (item as NGOData).address;
           
+          // Determine pin color based on type
+          const pinColorClass = isJob ? 
+            (index % 2 === 0 ? 'bg-primary' : 'bg-orange-500') : 
+            (index % 2 === 0 ? 'bg-green-500' : 'bg-red-500');
+          
           return (
             <div 
               key={index}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-fade-in"
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-fade-in z-10"
               style={{ top: `${top}%`, left: `${left}%` }}
             >
-              <div className={`p-1 rounded-full ${isJob ? 'bg-primary' : 'bg-green-500'} shadow-lg relative group`}>
+              <div className={`p-1 rounded-full ${pinColorClass} shadow-lg relative group`}>
                 <MapPin className="h-5 w-5 text-white" />
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[150px] bg-white shadow-lg rounded p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[180px] bg-white shadow-lg rounded p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                   <p className="font-semibold truncate">{label}</p>
                   <p className="text-muted-foreground truncate">{location}</p>
                 </div>
@@ -56,8 +64,20 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           );
         })}
         
-        <div className="absolute bottom-4 right-4 bg-white px-3 py-1.5 rounded-full shadow-md text-xs font-medium">
-          {activeType === "jobs" ? "Showing job opportunities" : "Showing support services"}
+        {/* User location indicator (blue dot with pulse effect) */}
+        <div 
+          className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
+          style={{ bottom: '30%', left: '45%' }}
+        >
+          <div className="relative">
+            <div className="h-4 w-4 bg-blue-500 rounded-full"></div>
+            <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse-subtle"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 bg-white rounded-full"></div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-4 right-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-xs font-medium">
+          {activeType === "jobs" ? "Showing job opportunities nearby" : "Showing support services nearby"}
         </div>
       </div>
     </div>
