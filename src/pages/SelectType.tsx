@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, User, Briefcase, Building, Heart } from "lucide-react";
@@ -38,11 +37,8 @@ const SelectType = () => {
   const { promptShown, setPromptShown } = useContext(AppContext);
 
   useEffect(() => {
-    // Mark that we've shown the prompt
-    if (!promptShown) {
-      setPromptShown(true);
-    }
-  }, [promptShown, setPromptShown]);
+    console.log("Select Type rendered, promptShown:", promptShown);
+  }, [promptShown]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -53,7 +49,7 @@ const SelectType = () => {
           <BackButton to="/" />
         </div>
         
-        {!promptShown && <WelcomePrompt />}
+        {promptShown === false && <WelcomePrompt />}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
           <UserTypeCard 
