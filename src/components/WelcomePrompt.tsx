@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { X, Heart } from "lucide-react";
+import { X, Heart, Info } from "lucide-react";
 
 interface WelcomePromptProps {
   message?: string;
@@ -14,7 +14,7 @@ const WelcomePrompt = ({
   if (!isVisible) return null;
 
   return (
-    <div className="relative mb-6 glass-card rounded-lg border-primary/20 animate-fade-in overflow-hidden">
+    <div className="relative mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-l-primary animate-fade-in overflow-hidden shadow-sm">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
       <button 
         onClick={() => setIsVisible(false)}
@@ -24,10 +24,13 @@ const WelcomePrompt = ({
         <X size={16} />
       </button>
       <div className="relative p-4 flex items-center gap-3">
-        <div className="p-2 rounded-full bg-primary/10">
-          <Heart size={18} className="text-primary animate-pulse-subtle" />
+        <div className="p-2.5 rounded-full bg-gradient-to-br from-primary/20 to-blue-400/20 border border-primary/10">
+          <Info size={18} className="text-primary animate-pulse-subtle" />
         </div>
-        <p className="pr-6 text-sm font-medium">{message}</p>
+        <div>
+          <p className="pr-6 text-sm font-medium">{message}</p>
+          <p className="text-xs text-muted-foreground mt-1">Together we can create pathways to independence</p>
+        </div>
       </div>
     </div>
   );
