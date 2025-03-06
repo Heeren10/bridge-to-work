@@ -45,7 +45,7 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Format salary to always use ₹ symbol
-  const formattedSalary = job.salary.startsWith('₹') ? job.salary : job.salary.replace('$', '₹');
+  const formattedSalary = job.salary.startsWith('₹') ? job.salary : `₹${job.salary.replace(/[^\d]/g, '')}`;
 
   return (
     <div 

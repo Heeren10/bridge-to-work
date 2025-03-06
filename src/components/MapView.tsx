@@ -24,7 +24,7 @@ const INDIAN_CITIES = [
   { name: "Lucknow", top: 38, left: 55, neighborhoods: ["Hazratganj", "Gomti Nagar", "Aliganj", "Chowk"] },
 ];
 
-// Roads connecting major cities for more map-like feel
+// Roads connecting major cities
 const ROADS = [
   { from: "Delhi", to: "Jaipur" },
   { from: "Delhi", to: "Lucknow" },

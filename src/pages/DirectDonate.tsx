@@ -49,7 +49,7 @@ const DonationOption = ({ name, amount, selected, onSelect }: {
     }`}
     onClick={onSelect}
   >
-    <p className="text-xl font-bold mb-1">${amount}</p>
+    <p className="text-xl font-bold mb-1">₹{amount}</p>
     <p className="text-sm text-muted-foreground">{name}</p>
   </button>
 );
@@ -144,37 +144,37 @@ const DirectDonate = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <DonationOption 
                   name="One Meal" 
-                  amount="10" 
-                  selected={donationAmount === "10"}
+                  amount="500" 
+                  selected={donationAmount === "500"}
                   onSelect={() => {
-                    setDonationAmount("10");
+                    setDonationAmount("500");
                     setCustomAmount("");
                   }}
                 />
                 <DonationOption 
                   name="One Day" 
-                  amount="25" 
-                  selected={donationAmount === "25"}
+                  amount="2000" 
+                  selected={donationAmount === "2000"}
                   onSelect={() => {
-                    setDonationAmount("25");
+                    setDonationAmount("2000");
                     setCustomAmount("");
                   }}
                 />
                 <DonationOption 
                   name="One Week" 
-                  amount="50" 
-                  selected={donationAmount === "50"}
+                  amount="5000" 
+                  selected={donationAmount === "5000"}
                   onSelect={() => {
-                    setDonationAmount("50");
+                    setDonationAmount("5000");
                     setCustomAmount("");
                   }}
                 />
                 <DonationOption 
                   name="One Month" 
-                  amount="100" 
-                  selected={donationAmount === "100"}
+                  amount="10000" 
+                  selected={donationAmount === "10000"}
                   onSelect={() => {
-                    setDonationAmount("100");
+                    setDonationAmount("10000");
                     setCustomAmount("");
                   }}
                 />
@@ -186,7 +186,7 @@ const DirectDonate = () => {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                    $
+                    ₹
                   </span>
                   <input
                     id="customAmount"
