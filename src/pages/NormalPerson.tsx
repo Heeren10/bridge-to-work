@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, Building, MapPin } from "lucide-react";
@@ -10,15 +9,15 @@ import BackButton from "../components/BackButton";
 import ReferModal from "../components/ReferModal";
 import MapView from "../components/MapView";
 
-// Fake data for demonstration
+// Fake data for demonstration with Indian locations and rupee currency
 const JOBS_DATA: JobData[] = [
   {
     id: "1",
     title: "Garden Assistant",
     description: "Help with basic gardening tasks including weeding, planting, and watering. No experience necessary, tools and guidance provided.",
     company: "Green City Initiative",
-    location: "Downtown",
-    salary: "$15/hour",
+    location: "Mumbai",
+    salary: "₹1,200/hour",
     duration: "1-2 days",
     skills: ["Physical work", "Outdoors"],
     date: "Today"
@@ -28,8 +27,8 @@ const JOBS_DATA: JobData[] = [
     title: "Kitchen Helper",
     description: "Assist in food preparation, cleaning, and serving in a busy community kitchen. Flexible hours, meals provided.",
     company: "Community Eats",
-    location: "Westside",
-    salary: "$14/hour",
+    location: "Delhi",
+    salary: "₹1,000/hour",
     duration: "Ongoing",
     skills: ["Food prep", "Cleaning"],
     date: "Today"
@@ -39,8 +38,8 @@ const JOBS_DATA: JobData[] = [
     title: "Moving Assistant",
     description: "Help with loading and unloading furniture and boxes. One-time opportunity with immediate payment.",
     company: "QuickMove Services",
-    location: "Eastside",
-    salary: "$100/day",
+    location: "Bangalore",
+    salary: "₹8,000/day",
     duration: "1 day",
     skills: ["Heavy lifting", "Attention to detail"],
     date: "Tomorrow"
@@ -50,8 +49,8 @@ const JOBS_DATA: JobData[] = [
     title: "Street Cleaning",
     description: "Join a team cleaning up the neighborhood streets. Equipment provided, no experience needed.",
     company: "Clean Streets Program",
-    location: "Various",
-    salary: "$13/hour",
+    location: "Hyderabad",
+    salary: "₹900/hour",
     duration: "Weekly",
     skills: ["Outdoors", "Community minded"],
     date: "This week"
@@ -63,8 +62,8 @@ const NGOS_DATA: NGOData[] = [
     id: "1",
     name: "Haven Shelter",
     description: "Emergency shelter providing beds, meals, and basic necessities for individuals experiencing homelessness.",
-    address: "123 Main St",
-    phone: "(555) 123-4567",
+    address: "Colaba, Mumbai",
+    phone: "022-12345678",
     website: "https://example.com",
     services: ["Shelter", "Meals", "Hygiene"],
     hours: "24/7"
@@ -73,8 +72,8 @@ const NGOS_DATA: NGOData[] = [
     id: "2",
     name: "New Beginnings Center",
     description: "Support services including counseling, job training, and housing assistance for those in need.",
-    address: "456 Oak Ave",
-    phone: "(555) 987-6543",
+    address: "Connaught Place, Delhi",
+    phone: "011-98765432",
     services: ["Counseling", "Job Training", "Housing Assistance"],
     hours: "Mon-Fri 8am-6pm"
   },
@@ -82,8 +81,8 @@ const NGOS_DATA: NGOData[] = [
     id: "3",
     name: "Community Health Clinic",
     description: "Free or low-cost healthcare services for uninsured or low-income individuals.",
-    address: "789 Elm Blvd",
-    phone: "(555) 567-8901",
+    address: "Indiranagar, Bangalore",
+    phone: "080-56781234",
     website: "https://example.com",
     services: ["Medical Care", "Dental", "Mental Health"],
     hours: "Mon-Sat 9am-5pm"
@@ -92,8 +91,8 @@ const NGOS_DATA: NGOData[] = [
     id: "4",
     name: "Daily Bread Food Bank",
     description: "Provides emergency food assistance to individuals and families facing food insecurity.",
-    address: "321 Pine Rd",
-    phone: "(555) 345-6789",
+    address: "Banjara Hills, Hyderabad",
+    phone: "040-34567890",
     services: ["Food Distribution", "SNAP Applications"],
     hours: "Tue-Sun 10am-4pm"
   }
@@ -106,7 +105,7 @@ const NormalPerson = () => {
   const [activeTab, setActiveTab] = useState<"jobs" | "services">("jobs");
   const [filteredJobs, setFilteredJobs] = useState(JOBS_DATA);
   const [filteredNGOs, setFilteredNGOs] = useState(NGOS_DATA);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true); // Set to true to show map by default
 
   // Filter data based on search query and active filters
   useEffect(() => {
@@ -118,17 +117,23 @@ const NormalPerson = () => {
         jobResults = jobResults.filter(job => 
           job.title.toLowerCase().includes(query) || 
           job.company.toLowerCase().includes(query) || 
-          job.description.toLowerCase().includes(query)
+          job.description.toLowerCase().includes(query) ||
+          job.location.toLowerCase().includes(query)
         );
       }
       
       // Apply category filters
       const activeFilterKeys = Object.keys(activeFilters).filter(key => activeFilters[key]);
       if (activeFilterKeys.length > 0) {
-        // This is a simplified example - in a real app, each job would have category tags
-        // Here we're just doing some basic filtering based on the limited data we have
         if (activeFilters['training']) {
-          jobResults = jobResults.filter(job => job.skills.some(skill => skill.toLowerCase().includes('training')));
+          jobResults = jobResults.filter(job => 
+            job.skills.some(skill => skill.toLowerCase().includes('training')) ||
+            job.description.toLowerCase().includes('training')
+          );
+        }
+        if (activeFilters['jobs']) {
+          // Keep all jobs when 'jobs' filter is active
+          // This is just for demonstration
         }
       }
       
@@ -141,6 +146,7 @@ const NormalPerson = () => {
         ngoResults = ngoResults.filter(ngo => 
           ngo.name.toLowerCase().includes(query) || 
           ngo.description.toLowerCase().includes(query) ||
+          ngo.address.toLowerCase().includes(query) ||
           ngo.services.some(service => service.toLowerCase().includes(query))
         );
       }
@@ -151,6 +157,10 @@ const NormalPerson = () => {
           ngoResults = ngoResults.filter(ngo => 
             ngo.services.some(service => service.toLowerCase().includes('shelter'))
           );
+        }
+        if (activeFilters['ngos']) {
+          // Keep all NGOs when 'ngos' filter is active
+          // This is just for demonstration
         }
       }
       
@@ -172,7 +182,7 @@ const NormalPerson = () => {
     setReferItem({ item, type });
   };
 
-  // Toggle map on mobile
+  // Just for responsiveness, not needed for map functionality
   const toggleMap = () => {
     setShowMap(!showMap);
   };
@@ -190,7 +200,7 @@ const NormalPerson = () => {
           <SearchFilter onSearch={handleSearch} onFilter={handleFilter} />
         </div>
         
-        {/* Mobile map toggle button */}
+        {/* Mobile map toggle button - only for toggling on small screens */}
         <div className="lg:hidden mb-4">
           <button 
             onClick={toggleMap}
@@ -201,9 +211,9 @@ const NormalPerson = () => {
           </button>
         </div>
         
-        {/* Mobile Map View */}
+        {/* Mobile Map View - always visible unless toggled off */}
         {showMap && (
-          <div className="lg:hidden mb-6 h-[300px]">
+          <div className="lg:hidden mb-6 h-[350px]">
             <MapView 
               jobs={filteredJobs} 
               ngos={filteredNGOs} 
@@ -233,7 +243,7 @@ const NormalPerson = () => {
               
               <TabsContent value="jobs" className="space-y-4 animate-fade-in">
                 <div className="flex items-center gap-2 mb-4">
-                  <MapPin size={16} className="text-muted-foreground" />
+                  <MapPin size={16} className="text-primary" />
                   <span className="text-sm text-muted-foreground">Showing opportunities near you</span>
                 </div>
                 
@@ -256,7 +266,7 @@ const NormalPerson = () => {
               
               <TabsContent value="services" className="space-y-4 animate-fade-in">
                 <div className="flex items-center gap-2 mb-4">
-                  <MapPin size={16} className="text-muted-foreground" />
+                  <MapPin size={16} className="text-primary" />
                   <span className="text-sm text-muted-foreground">Showing services near you</span>
                 </div>
                 
