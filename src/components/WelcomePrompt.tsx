@@ -1,13 +1,13 @@
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Heart } from "lucide-react";
 
 interface WelcomePromptProps {
   message?: string;
 }
 
 const WelcomePrompt = ({ 
-  message = "Say no to Cash, Direct them" 
+  message = "Say no to cash - Help create sustainable change through opportunities" 
 }: WelcomePromptProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -22,7 +22,10 @@ const WelcomePrompt = ({
       >
         <X size={16} />
       </button>
-      <p className="pr-6 text-sm">{message}</p>
+      <div className="flex items-center gap-2">
+        <Heart size={18} className="text-primary shrink-0" />
+        <p className="pr-6 text-sm">{message}</p>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, X } from "lucide-react";
 
 interface SearchFilterProps {
@@ -24,9 +24,10 @@ const SearchFilter = ({
     filterOptions.reduce((acc, option) => ({ ...acc, [option.id]: false }), {})
   );
 
-  const handleSearch = () => {
+  // Call onSearch whenever searchQuery changes
+  useEffect(() => {
     onSearch(searchQuery);
-  };
+  }, [searchQuery, onSearch]);
 
   const handleFilterToggle = (filterId: string) => {
     const updatedFilters = {
@@ -39,7 +40,6 @@ const SearchFilter = ({
 
   const clearSearch = () => {
     setSearchQuery("");
-    onSearch("");
   };
 
   return (
@@ -52,9 +52,8 @@ const SearchFilter = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search opportunities..."
             className="input-field w-full pl-10 pr-10"
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary" size={18} />
           {searchQuery && (
             <button 
               onClick={clearSearch}

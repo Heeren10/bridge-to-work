@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, Building, MapPin } from "lucide-react";
 import Header from "../components/Header";
@@ -104,19 +104,77 @@ const NormalPerson = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>({});
   const [referItem, setReferItem] = useState<{ item: any; type: "job" | "ngo" } | null>(null);
   const [activeTab, setActiveTab] = useState<"jobs" | "services">("jobs");
+  const [filteredJobs, setFilteredJobs] = useState(JOBS_DATA);
+  const [filteredNGOs, setFilteredNGOs] = useState(NGOS_DATA);
+  const [showMap, setShowMap] = useState(false);
+
+  // Filter data based on search query and active filters
+  useEffect(() => {
+    const filterData = () => {
+      // Filter jobs
+      let jobResults = JOBS_DATA;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        jobResults = jobResults.filter(job => 
+          job.title.toLowerCase().includes(query) || 
+          job.company.toLowerCase().includes(query) || 
+          job.description.toLowerCase().includes(query)
+        );
+      }
+      
+      // Apply category filters
+      const activeFilterKeys = Object.keys(activeFilters).filter(key => activeFilters[key]);
+      if (activeFilterKeys.length > 0) {
+        // This is a simplified example - in a real app, each job would have category tags
+        // Here we're just doing some basic filtering based on the limited data we have
+        if (activeFilters['training']) {
+          jobResults = jobResults.filter(job => job.skills.some(skill => skill.toLowerCase().includes('training')));
+        }
+      }
+      
+      setFilteredJobs(jobResults);
+      
+      // Filter NGOs
+      let ngoResults = NGOS_DATA;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        ngoResults = ngoResults.filter(ngo => 
+          ngo.name.toLowerCase().includes(query) || 
+          ngo.description.toLowerCase().includes(query) ||
+          ngo.services.some(service => service.toLowerCase().includes(query))
+        );
+      }
+      
+      // Apply category filters
+      if (activeFilterKeys.length > 0) {
+        if (activeFilters['shelters']) {
+          ngoResults = ngoResults.filter(ngo => 
+            ngo.services.some(service => service.toLowerCase().includes('shelter'))
+          );
+        }
+      }
+      
+      setFilteredNGOs(ngoResults);
+    };
+    
+    filterData();
+  }, [searchQuery, activeFilters]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // In a real app, this would filter data
   };
 
   const handleFilter = (filters: Record<string, boolean>) => {
     setActiveFilters(filters);
-    // In a real app, this would filter data
   };
 
   const handleRefer = (item: any, type: "job" | "ngo") => {
     setReferItem({ item, type });
+  };
+
+  // Toggle map on mobile
+  const toggleMap = () => {
+    setShowMap(!showMap);
   };
 
   return (
@@ -131,6 +189,28 @@ const NormalPerson = () => {
         <div className="mb-6">
           <SearchFilter onSearch={handleSearch} onFilter={handleFilter} />
         </div>
+        
+        {/* Mobile map toggle button */}
+        <div className="lg:hidden mb-4">
+          <button 
+            onClick={toggleMap}
+            className="w-full py-2 bg-primary text-white rounded-lg flex justify-center items-center gap-2"
+          >
+            <MapPin size={18} />
+            {showMap ? "Hide Map" : "Show Map"}
+          </button>
+        </div>
+        
+        {/* Mobile Map View */}
+        {showMap && (
+          <div className="lg:hidden mb-6 h-[300px]">
+            <MapView 
+              jobs={filteredJobs} 
+              ngos={filteredNGOs} 
+              activeType={activeTab} 
+            />
+          </div>
+        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-240px)]">
           {/* Left column - Opportunities list */}
@@ -157,15 +237,21 @@ const NormalPerson = () => {
                   <span className="text-sm text-muted-foreground">Showing opportunities near you</span>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-4">
-                  {JOBS_DATA.map(job => (
-                    <JobCard 
-                      key={job.id} 
-                      job={job}
-                      onRefer={() => handleRefer(job, "job")}
-                    />
-                  ))}
-                </div>
+                {filteredJobs.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {filteredJobs.map(job => (
+                      <JobCard 
+                        key={job.id} 
+                        job={job}
+                        onRefer={() => handleRefer(job, "job")}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 text-center border border-dashed rounded-lg">
+                    <p className="text-muted-foreground">No jobs matching your search</p>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="services" className="space-y-4 animate-fade-in">
@@ -174,22 +260,32 @@ const NormalPerson = () => {
                   <span className="text-sm text-muted-foreground">Showing services near you</span>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-4">
-                  {NGOS_DATA.map(ngo => (
-                    <NGOCard 
-                      key={ngo.id} 
-                      ngo={ngo}
-                      onRefer={() => handleRefer(ngo, "ngo")}
-                    />
-                  ))}
-                </div>
+                {filteredNGOs.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {filteredNGOs.map(ngo => (
+                      <NGOCard 
+                        key={ngo.id} 
+                        ngo={ngo}
+                        onRefer={() => handleRefer(ngo, "ngo")}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 text-center border border-dashed rounded-lg">
+                    <p className="text-muted-foreground">No services matching your search</p>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
           
-          {/* Right column - Map */}
+          {/* Right column - Map (desktop only) */}
           <div className="lg:col-span-3 hidden lg:block">
-            <MapView jobs={JOBS_DATA} ngos={NGOS_DATA} activeType={activeTab} />
+            <MapView 
+              jobs={filteredJobs} 
+              ngos={filteredNGOs} 
+              activeType={activeTab} 
+            />
           </div>
         </div>
       </main>

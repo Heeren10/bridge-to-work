@@ -27,7 +27,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         ref={mapRef} 
         className="h-full relative" 
         style={{
-          backgroundImage: "url('/lovable-uploads/9e3eca6c-5ff1-4aa1-97b6-8a64c0a0eb34.png')",
+          backgroundImage: "url('/lovable-uploads/165c8b71-2cca-4b61-99b2-3c5414e1c0ec.png')",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
@@ -42,10 +42,8 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           const label = isJob ? (item as JobData).title : (item as NGOData).name;
           const location = isJob ? (item as JobData).location : (item as NGOData).address;
           
-          // Determine pin color based on type
-          const pinColorClass = isJob ? 
-            (index % 2 === 0 ? 'bg-primary' : 'bg-orange-500') : 
-            (index % 2 === 0 ? 'bg-green-500' : 'bg-red-500');
+          // All pins use the primary red color for better visibility
+          const pinColorClass = "bg-red-500";
           
           return (
             <div 
@@ -53,9 +51,9 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
               className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-fade-in z-10"
               style={{ top: `${top}%`, left: `${left}%` }}
             >
-              <div className={`p-1 rounded-full ${pinColorClass} shadow-lg relative group`}>
-                <MapPin className="h-5 w-5 text-white" />
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[180px] bg-white shadow-lg rounded p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+              <div className={`${pinColorClass} shadow-lg relative group`} style={{ width: "24px", height: "36px", borderRadius: "50% 50% 50% 0", transform: "rotate(-45deg)" }}>
+                <div className="absolute inset-0 m-auto bg-white rounded-full" style={{ width: "12px", height: "12px", transform: "rotate(45deg)" }}></div>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 rotate-45 mb-3 w-max max-w-[180px] bg-white shadow-lg rounded p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                   <p className="font-semibold truncate">{label}</p>
                   <p className="text-muted-foreground truncate">{location}</p>
                 </div>
