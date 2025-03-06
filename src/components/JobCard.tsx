@@ -1,5 +1,5 @@
 
-import { MapPin, Clock, Indian, Briefcase, Calendar } from "lucide-react";
+import { MapPin, Clock, Briefcase, Calendar } from "lucide-react";
 import { useState } from "react";
 
 export interface JobData {
@@ -44,24 +44,24 @@ const RupeeIcon = () => (
 const JobCard = ({ job, onRefer }: JobCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Convert salary format from $ to ₹
-  const formattedSalary = job.salary.replace('$', '₹');
+  // Format salary to always use ₹ symbol
+  const formattedSalary = job.salary.startsWith('₹') ? job.salary : job.salary.replace('$', '₹');
 
   return (
     <div 
-      className="glass-card rounded-xl overflow-hidden card-hover transition-all duration-300"
+      className="glass-card rounded-xl overflow-hidden card-hover transition-all duration-300 border-l-4 border-l-primary"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="p-4">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-accent rounded-full">
-              <Briefcase size={16} className="text-primary" />
+            <div className="p-2 bg-gradient-to-br from-primary to-primary/80 rounded-full">
+              <Briefcase size={16} className="text-white" />
             </div>
             <h3 className="font-semibold text-lg">{job.title}</h3>
           </div>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-accent rounded-full">
-            <Calendar size={12} className="text-primary" />
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">
+            <Calendar size={12} />
             <span className="text-xs font-medium">{job.date}</span>
           </div>
         </div>
@@ -69,16 +69,16 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
         
         <div className="grid grid-cols-2 gap-2 mt-3">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin size={14} className="text-primary" />
+            <MapPin size={14} className="text-rose-500" />
             <span>{job.location}</span>
           </div>
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock size={14} className="text-primary" />
+            <Clock size={14} className="text-blue-500" />
             <span>{job.duration}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-sm font-medium text-green-700">
             <RupeeIcon />
-            <span className="font-medium text-primary">{formattedSalary}</span>
+            <span>{formattedSalary}</span>
           </div>
         </div>
 
@@ -89,7 +89,7 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
               {job.skills.map((skill, index) => (
                 <span 
                   key={index} 
-                  className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium"
+                  className="px-2.5 py-0.5 bg-gradient-to-r from-primary/10 to-primary/20 text-primary text-xs rounded-full font-medium"
                 >
                   {skill}
                 </span>
@@ -97,7 +97,7 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
             </div>
             {onRefer && (
               <button 
-                className="w-full py-2 mt-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+                className="w-full py-2 mt-2 text-sm font-medium text-white bg-gradient-to-r from-primary to-blue-600 rounded-lg hover:from-primary/90 hover:to-blue-700 transition-colors shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRefer(job);

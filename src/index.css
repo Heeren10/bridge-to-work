@@ -127,4 +127,95 @@
   .container-padding {
     @apply px-4 py-6 md:px-6 md:py-8;
   }
+  
+  /* New colorful UI elements */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .card-gradient-blue {
+    @apply bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200;
+  }
+  
+  .card-gradient-green {
+    @apply bg-gradient-to-br from-green-50 to-green-100 border border-green-200;
+  }
+  
+  .card-gradient-amber {
+    @apply bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200;
+  }
+  
+  .card-gradient-rose {
+    @apply bg-gradient-to-br from-rose-50 to-rose-100 border border-rose-200;
+  }
+  
+  .map-pin {
+    @apply transition-all duration-300 hover:scale-110 hover:z-30;
+  }
+  
+  .map-pin-pulse::before {
+    content: '';
+    @apply absolute inset-0 rounded-full animate-ping;
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.4s ease-out;
 }
