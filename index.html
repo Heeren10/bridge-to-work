@@ -8,14 +8,13 @@
     <meta name="description" content="Connecting opportunities with those who need them most" />
     <meta name="author" content="Bridge to Work" />
     <meta property="og:image" content="/og-image.png" />
-    <link rel="stylesheet" href="styles.css" />
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Add preload for critical fonts or other assets if needed -->
   </head>
   <body>
-    <div id="app"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script src="js/app.js" type="module"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
