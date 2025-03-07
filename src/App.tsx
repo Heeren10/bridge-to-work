@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createContext, useState, lazy, Suspense } from "react";
-import { Spinner } from "lucide-react";
+import { Loader } from "lucide-react";
 
 // Use lazy loading to split code by route
 const Index = lazy(() => import("./pages/Index"));
@@ -39,7 +39,7 @@ const queryClient = new QueryClient({
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="flex flex-col items-center space-y-4">
-      <Spinner className="animate-spin h-10 w-10 text-primary" />
+      <Loader className="animate-spin h-10 w-10 text-primary" />
       <span className="text-muted-foreground">Loading...</span>
     </div>
   </div>
