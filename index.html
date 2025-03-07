@@ -9,8 +9,13 @@
     <meta name="author" content="Bridge to Work" />
     <meta property="og:image" content="/og-image.png" />
     <link rel="stylesheet" href="styles.css" />
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Preload important resources -->
+    <link rel="preload" href="js/app.js" as="script" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <!-- Use async to not block rendering -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" async></script>
+    <!-- Add dns-prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
   </head>
   <body>
     <div id="app"></div>

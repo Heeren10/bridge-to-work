@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, memo } from "react";
 import { JobData } from "./JobCard";
 import { NGOData } from "./NGOCard";
 import { MapPin, Navigation, Compass, ArrowUpRight, Search, Map, Layers } from "lucide-react";
@@ -10,7 +10,7 @@ interface MapViewProps {
   activeType: "jobs" | "services";
 }
 
-// More detailed Indian cities data with neighborhoods
+// More detailed Indian cities data with neighborhoods - moved outside component to prevent recreations
 const INDIAN_CITIES = [
   { name: "Mumbai", top: 65, left: 22, neighborhoods: ["Colaba", "Bandra", "Andheri", "Juhu Beach"], landmarks: ["Gateway of India", "Marine Drive"] },
   { name: "Delhi", top: 30, left: 48, neighborhoods: ["Connaught Place", "Chandni Chowk", "Hauz Khas", "India Gate"], landmarks: ["Red Fort", "Qutub Minar"] },
@@ -24,7 +24,7 @@ const INDIAN_CITIES = [
   { name: "Lucknow", top: 38, left: 55, neighborhoods: ["Hazratganj", "Gomti Nagar", "Aliganj", "Chowk"], landmarks: ["Bara Imambara", "Rumi Darwaza"] },
 ];
 
-// Roads connecting major cities
+// Roads connecting major cities - moved outside component
 const ROADS = [
   { from: "Delhi", to: "Jaipur", width: 2 },
   { from: "Delhi", to: "Lucknow", width: 2 },
@@ -38,7 +38,7 @@ const ROADS = [
   { from: "Chennai", to: "Hyderabad", width: 1 },
 ];
 
-// Geographic features
+// Geographic features - moved outside component
 const GEO_FEATURES = [
   { type: "river", name: "Ganges", path: "M80,30 C85,35 90,45 85,55 C80,65 75,70 70,75", color: "#A5D8FF", width: 3 },
   { type: "river", name: "Yamuna", path: "M48,30 C50,40 45,50 50,60", color: "#A5D8FF", width: 2 },
@@ -48,42 +48,74 @@ const GEO_FEATURES = [
   { type: "sea", name: "Bay of Bengal", center: { x: 80, y: 75 }, color: "#D6F0FF" },
 ];
 
-const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [mapView, setMapView] = useState<"satellite" | "terrain" | "standard">("standard");
-  const [highlightedCity, setHighlightedCity] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // This would be where we'd initialize an interactive map 
-    // For this demo, we're using a static image with enhanced features
-  }, [jobs, ngos, activeType]);
+// Memoized components for better performance
+const MapControls = memo(({ mapView, setMapView }: { mapView: string, setMapView: (view: any) => void }) => (
+  <div className="bg-white rounded-lg shadow-md p-2 flex gap-2">
+    <button
+      className={`p-1.5 rounded-md transition-colors ${mapView === 'standard' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+      onClick={() => setMapView('standard')}
+      title="Standard view"
+    >
+      <Map size={16} />
+    </button>
+    <button
+      className={`p-1.5 rounded-md transition-colors ${mapView === 'satellite' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+      onClick={() => setMapView('satellite')}
+      title="Satellite view"
+    >
+      <Layers size={16} />
+    </button>
+    <button
+      className={`p-1.5 rounded-md transition-colors ${mapView === 'terrain' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+      onClick={() => setMapView('terrain')}
+      title="Terrain view"
+    >
+      <Compass size={16} />
+    </button>
+  </div>
+));
 
-  const items = activeType === "jobs" ? jobs : ngos;
+// Memoized city search component
+const CitySearch = memo(({ cities, highlightedCity, setHighlightedCity }: { 
+  cities: typeof INDIAN_CITIES, 
+  highlightedCity: string | null, 
+  setHighlightedCity: (city: string | null) => void 
+}) => (
+  <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="p-2 bg-blue-50 border-b border-gray-200 flex items-center">
+      <Search size={14} className="text-blue-500 mr-1" />
+      <span className="text-xs font-medium text-blue-700">Find on map</span>
+    </div>
+    <div className="max-h-32 overflow-y-auto py-1">
+      {cities.map((city, i) => (
+        <button
+          key={`search-${i}`}
+          className="w-full text-left px-3 py-1 text-xs hover:bg-blue-50 transition-colors flex items-center"
+          onMouseEnter={() => setHighlightedCity(city.name)}
+          onMouseLeave={() => setHighlightedCity(null)}
+        >
+          <MapPin size={10} className="text-rose-500 mr-1.5" />
+          {city.name}
+        </button>
+      ))}
+    </div>
+  </div>
+));
 
-  // Function to find city coordinates by name
-  const getCityCoordinates = (cityName: string) => {
-    const city = INDIAN_CITIES.find(c => c.name === cityName);
-    if (city) return { top: city.top, left: city.left };
-    
-    // Default to center if city not found
-    return { top: 50, left: 50 };
-  };
-
-  // Draw roads between cities
-  const renderRoads = () => {
-    return ROADS.map((road, index) => {
-      const fromCity = INDIAN_CITIES.find(c => c.name === road.from);
-      const toCity = INDIAN_CITIES.find(c => c.name === road.to);
+// Memoized road renderer component
+const RoadNetwork = memo(({ roads, cities }: { roads: typeof ROADS, cities: typeof INDIAN_CITIES }) => (
+  <>
+    {roads.map((road, index) => {
+      const fromCity = cities.find(c => c.name === road.from);
+      const toCity = cities.find(c => c.name === road.to);
       
       if (!fromCity || !toCity) return null;
       
-      // Calculate the road path
       const x1 = fromCity.left;
       const y1 = fromCity.top;
       const x2 = toCity.left;
       const y2 = toCity.top;
       
-      // Road styling
       return (
         <div 
           key={`road-${index}`} 
@@ -101,12 +133,14 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           }}
         />
       );
-    });
-  };
+    })}
+  </>
+));
 
-  // Render geographic features
-  const renderGeoFeatures = () => {
-    return GEO_FEATURES.map((feature, index) => {
+// Memoized geo features component
+const GeoFeatures = memo(({ features }: { features: typeof GEO_FEATURES }) => (
+  <>
+    {features.map((feature, index) => {
       if (feature.type === "river" || feature.type === "mountain") {
         return (
           <svg
@@ -141,56 +175,158 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         );
       }
       return null;
-    });
-  };
+    })}
+  </>
+));
 
+// City Component for better performance
+const City = memo(({ city, isHighlighted, index }: { 
+  city: typeof INDIAN_CITIES[0], 
+  isHighlighted: boolean,
+  index: number
+}) => (
+  <div key={`city-${index}`} className="absolute z-10" style={{ top: `${city.top}%`, left: `${city.left}%` }}>
+    {/* City marker */}
+    <div 
+      className={`absolute w-3 h-3 bg-gradient-to-r ${isHighlighted ? 'from-primary to-blue-500 scale-150' : 'from-gray-500 to-gray-600'} rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-md transition-all duration-300 border border-white`}
+      style={{ 
+        boxShadow: isHighlighted ? '0 0 0 4px rgba(59, 130, 246, 0.3)' : 'none'
+      }}
+    ></div>
+    
+    {/* City name with highlight */}
+    <div 
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 mt-4 text-xs font-bold ${isHighlighted ? 'bg-white text-primary' : 'bg-white/90 text-gray-800'} px-2 py-1 rounded-md shadow-md border transition-all duration-300`}
+      style={{
+        borderColor: isHighlighted ? 'rgb(59, 130, 246)' : 'rgb(209, 213, 219)',
+        zIndex: isHighlighted ? 40 : 30
+      }}
+    >
+      {city.name}
+      {isHighlighted && (
+        <div className="absolute top-full left-0 w-full mt-1">
+          <div className="bg-white px-2 py-1.5 rounded-md shadow-md border border-gray-200 text-[9px] font-normal">
+            <div className="flex items-center text-gray-700">
+              <span className="font-medium">Areas:</span> 
+              <span className="ml-1">{city.neighborhoods.slice(0, 2).join(', ')}</span>
+            </div>
+            {city.landmarks && (
+              <div className="flex items-center text-gray-700 mt-1">
+                <span className="font-medium">Landmarks:</span>
+                <span className="ml-1">{city.landmarks.slice(0, 2).join(', ')}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+    
+    {/* Neighborhoods as smaller labels */}
+    {!isHighlighted && city.neighborhoods.slice(0, 2).map((hood, hoodIndex) => {
+      // Position neighborhoods around the city
+      const angle = (hoodIndex * (360 / 4)) * (Math.PI / 180);
+      const distance = 4; // % distance from city center
+      const hoodTop = distance * Math.sin(angle);
+      const hoodLeft = distance * Math.cos(angle);
+      
+      return (
+        <div 
+          key={`hood-${city.name}-${hoodIndex}`}
+          className="absolute text-[8px] font-medium bg-white/70 px-1 py-0.5 rounded-sm transform -translate-x-1/2 -translate-y-1/2 border border-gray-200 whitespace-nowrap"
+          style={{ 
+            top: `calc(${hoodTop}% + 0%)`, 
+            left: `calc(${hoodLeft}% + 0%)` 
+          }}
+        >
+          {hood}
+        </div>
+      );
+    })}
+  </div>
+));
+
+// Location Pins Component
+const LocationPins = memo(({ items, activeType }: { 
+  items: JobData[] | NGOData[], 
+  activeType: "jobs" | "services" 
+}) => {
+  return (
+    <>
+      {items.map((item, index) => {
+        // Find the city for this item
+        const isJob = activeType === "jobs";
+        const location = isJob ? (item as JobData).location : (item as NGOData).address;
+        const cityName = location.split(',')[0].trim();
+        
+        // Get city coordinates
+        const basedOnCity = INDIAN_CITIES.find(c => c.name === cityName) || 
+                          INDIAN_CITIES[index % INDIAN_CITIES.length];
+        
+        // Add small variance to avoid exact overlaps
+        const variance = 3;
+        const top = basedOnCity.top + (Math.random() * variance * 2 - variance);
+        const left = basedOnCity.left + (Math.random() * variance * 2 - variance);
+        
+        const label = isJob ? (item as JobData).title : (item as NGOData).name;
+        const details = isJob ? (item as JobData).company : (item as NGOData).services.join(', ');
+        
+        // Use different pin colors for jobs vs services
+        const pinColorClass = isJob 
+          ? "bg-gradient-to-b from-blue-500 to-blue-600" 
+          : "bg-gradient-to-b from-rose-500 to-rose-600";
+        const pulseColorClass = isJob ? "bg-blue-400" : "bg-rose-400";
+        
+        return (
+          <div 
+            key={index}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-fade-in z-20 cursor-pointer"
+            style={{ top: `${top}%`, left: `${left}%` }}
+          >
+            <div className={`${pinColorClass} shadow-lg relative group`} style={{ width: "20px", height: "30px", borderRadius: "50% 50% 50% 0", transform: "rotate(-45deg)" }}>
+              <div className="absolute inset-0 m-auto bg-white rounded-full" style={{ width: "10px", height: "10px", transform: "rotate(45deg)" }}></div>
+              
+              {/* Pulse animation ring */}
+              <div className={`absolute -inset-2 ${pulseColorClass}/30 rounded-full animate-pulse-subtle opacity-60`} style={{ transform: "rotate(45deg)" }}></div>
+              
+              {/* Tooltip on hover */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 rotate-45 mb-3 w-max max-w-[200px] bg-white shadow-lg rounded-md p-3 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20 border border-gray-200">
+                <div className="font-bold text-sm mb-1 truncate">{label}</div>
+                <p className="text-muted-foreground truncate">{location}</p>
+                <p className="text-xs mt-1 truncate">{details}</p>
+                {isJob && (
+                  <p className="text-green-600 font-medium mt-1">{(item as JobData).salary}</p>
+                )}
+                <div className="flex items-center mt-2 text-primary text-[10px] gap-0.5 font-medium">
+                  <span>View details</span>
+                  <ArrowUpRight size={8} />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+});
+
+const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapView, setMapView] = useState<"satellite" | "terrain" | "standard">("standard");
+  const [highlightedCity, setHighlightedCity] = useState<string | null>(null);
+  
+  // Use memoized items to prevent unnecessary re-renders
+  const items = useMemo(() => activeType === "jobs" ? jobs : ngos, [jobs, ngos, activeType]);
+  
   return (
     <div className="rounded-xl overflow-hidden h-full relative shadow-xl border border-blue-200/50">
       {/* Map controls */}
       <div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
-        <div className="bg-white rounded-lg shadow-md p-2 flex gap-2">
-          <button
-            className={`p-1.5 rounded-md transition-colors ${mapView === 'standard' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-            onClick={() => setMapView('standard')}
-            title="Standard view"
-          >
-            <Map size={16} />
-          </button>
-          <button
-            className={`p-1.5 rounded-md transition-colors ${mapView === 'satellite' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-            onClick={() => setMapView('satellite')}
-            title="Satellite view"
-          >
-            <Layers size={16} />
-          </button>
-          <button
-            className={`p-1.5 rounded-md transition-colors ${mapView === 'terrain' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-            onClick={() => setMapView('terrain')}
-            title="Terrain view"
-          >
-            <Compass size={16} />
-          </button>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-2 bg-blue-50 border-b border-gray-200 flex items-center">
-            <Search size={14} className="text-blue-500 mr-1" />
-            <span className="text-xs font-medium text-blue-700">Find on map</span>
-          </div>
-          <div className="max-h-32 overflow-y-auto py-1">
-            {INDIAN_CITIES.map((city, i) => (
-              <button
-                key={`search-${i}`}
-                className="w-full text-left px-3 py-1 text-xs hover:bg-blue-50 transition-colors flex items-center"
-                onMouseEnter={() => setHighlightedCity(city.name)}
-                onMouseLeave={() => setHighlightedCity(null)}
-              >
-                <MapPin size={10} className="text-rose-500 mr-1.5" />
-                {city.name}
-              </button>
-            ))}
-          </div>
-        </div>
+        <MapControls mapView={mapView} setMapView={setMapView} />
+        <CitySearch 
+          cities={INDIAN_CITIES} 
+          highlightedCity={highlightedCity} 
+          setHighlightedCity={setHighlightedCity} 
+        />
       </div>
       
       {/* Map background with styling based on selected view */}
@@ -221,130 +357,23 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         <div className="absolute inset-0 bg-gradient-to-b from-sky-100/5 to-transparent pointer-events-none"></div>
         
         {/* Geographic features */}
-        {mapView !== 'satellite' && renderGeoFeatures()}
+        {mapView !== 'satellite' && <GeoFeatures features={GEO_FEATURES} />}
         
         {/* Road network */}
-        {renderRoads()}
+        <RoadNetwork roads={ROADS} cities={INDIAN_CITIES} />
         
         {/* City labels on the map */}
-        {INDIAN_CITIES.map((city, index) => {
-          const isHighlighted = highlightedCity === city.name;
-          return (
-            <div key={`city-${index}`} className="absolute z-10" style={{ top: `${city.top}%`, left: `${city.left}%` }}>
-              {/* City marker */}
-              <div 
-                className={`absolute w-3 h-3 bg-gradient-to-r ${isHighlighted ? 'from-primary to-blue-500 scale-150' : 'from-gray-500 to-gray-600'} rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-md transition-all duration-300 border border-white`}
-                style={{ 
-                  boxShadow: isHighlighted ? '0 0 0 4px rgba(59, 130, 246, 0.3)' : 'none'
-                }}
-              ></div>
-              
-              {/* City name with highlight */}
-              <div 
-                className={`absolute transform -translate-x-1/2 -translate-y-1/2 mt-4 text-xs font-bold ${isHighlighted ? 'bg-white text-primary' : 'bg-white/90 text-gray-800'} px-2 py-1 rounded-md shadow-md border transition-all duration-300`}
-                style={{
-                  borderColor: isHighlighted ? 'rgb(59, 130, 246)' : 'rgb(209, 213, 219)',
-                  zIndex: isHighlighted ? 40 : 30
-                }}
-              >
-                {city.name}
-                {isHighlighted && (
-                  <div className="absolute top-full left-0 w-full mt-1">
-                    <div className="bg-white px-2 py-1.5 rounded-md shadow-md border border-gray-200 text-[9px] font-normal">
-                      <div className="flex items-center text-gray-700">
-                        <span className="font-medium">Areas:</span> 
-                        <span className="ml-1">{city.neighborhoods.slice(0, 2).join(', ')}</span>
-                      </div>
-                      {city.landmarks && (
-                        <div className="flex items-center text-gray-700 mt-1">
-                          <span className="font-medium">Landmarks:</span>
-                          <span className="ml-1">{city.landmarks.slice(0, 2).join(', ')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Neighborhoods as smaller labels */}
-              {!isHighlighted && city.neighborhoods.slice(0, 2).map((hood, hoodIndex) => {
-                // Position neighborhoods around the city
-                const angle = (hoodIndex * (360 / 4)) * (Math.PI / 180);
-                const distance = 4; // % distance from city center
-                const hoodTop = distance * Math.sin(angle);
-                const hoodLeft = distance * Math.cos(angle);
-                
-                return (
-                  <div 
-                    key={`hood-${city.name}-${hoodIndex}`}
-                    className="absolute text-[8px] font-medium bg-white/70 px-1 py-0.5 rounded-sm transform -translate-x-1/2 -translate-y-1/2 border border-gray-200 whitespace-nowrap"
-                    style={{ 
-                      top: `calc(${hoodTop}% + 0%)`, 
-                      left: `calc(${hoodLeft}% + 0%)` 
-                    }}
-                  >
-                    {hood}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+        {INDIAN_CITIES.map((city, index) => (
+          <City 
+            key={`city-${index}`}
+            city={city}
+            isHighlighted={highlightedCity === city.name}
+            index={index}
+          />
+        ))}
         
         {/* Pins for locations */}
-        {items.map((item, index) => {
-          // Find the city for this item
-          const isJob = activeType === "jobs";
-          const location = isJob ? (item as JobData).location : (item as NGOData).address;
-          const cityName = location.split(',')[0].trim();
-          
-          // Get city coordinates
-          const basedOnCity = INDIAN_CITIES.find(c => c.name === cityName) || 
-                            INDIAN_CITIES[index % INDIAN_CITIES.length];
-          
-          // Add small variance to avoid exact overlaps
-          const variance = 3;
-          const top = basedOnCity.top + (Math.random() * variance * 2 - variance);
-          const left = basedOnCity.left + (Math.random() * variance * 2 - variance);
-          
-          const label = isJob ? (item as JobData).title : (item as NGOData).name;
-          const details = isJob ? (item as JobData).company : (item as NGOData).services.join(', ');
-          
-          // Use different pin colors for jobs vs services
-          const pinColorClass = isJob 
-            ? "bg-gradient-to-b from-blue-500 to-blue-600" 
-            : "bg-gradient-to-b from-rose-500 to-rose-600";
-          const pulseColorClass = isJob ? "bg-blue-400" : "bg-rose-400";
-          
-          return (
-            <div 
-              key={index}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-fade-in z-20 cursor-pointer"
-              style={{ top: `${top}%`, left: `${left}%` }}
-            >
-              <div className={`${pinColorClass} shadow-lg relative group`} style={{ width: "20px", height: "30px", borderRadius: "50% 50% 50% 0", transform: "rotate(-45deg)" }}>
-                <div className="absolute inset-0 m-auto bg-white rounded-full" style={{ width: "10px", height: "10px", transform: "rotate(45deg)" }}></div>
-                
-                {/* Pulse animation ring */}
-                <div className={`absolute -inset-2 ${pulseColorClass}/30 rounded-full animate-pulse-subtle opacity-60`} style={{ transform: "rotate(45deg)" }}></div>
-                
-                {/* Tooltip on hover */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 rotate-45 mb-3 w-max max-w-[200px] bg-white shadow-lg rounded-md p-3 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20 border border-gray-200">
-                  <div className="font-bold text-sm mb-1 truncate">{label}</div>
-                  <p className="text-muted-foreground truncate">{location}</p>
-                  <p className="text-xs mt-1 truncate">{details}</p>
-                  {isJob && (
-                    <p className="text-green-600 font-medium mt-1">{(item as JobData).salary}</p>
-                  )}
-                  <div className="flex items-center mt-2 text-primary text-[10px] gap-0.5 font-medium">
-                    <span>View details</span>
-                    <ArrowUpRight size={8} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        <LocationPins items={items} activeType={activeType} />
         
         {/* User location indicator with improved styling */}
         <div 
@@ -363,33 +392,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           </div>
         </div>
         
-        {/* Enhanced compass rose decoration */}
-        <div className="absolute bottom-6 left-6 h-16 w-16 opacity-80">
-          <div className="relative h-full w-full">
-            <div className="absolute h-full w-full rounded-full border-2 border-gray-700/30 bg-white/60 backdrop-blur-sm shadow-inner"></div>
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-700/50 transform -translate-y-1/2"></div>
-            <div className="absolute top-0 left-1/2 h-full w-0.5 bg-gray-700/50 transform -translate-x-1/2"></div>
-            {/* Diagonal lines */}
-            <div className="absolute top-0 left-0 w-full h-full">
-              <div className="w-full h-0.5 bg-gray-700/30 absolute top-1/2 left-0 transform -translate-y-1/2 rotate-45"></div>
-              <div className="w-full h-0.5 bg-gray-700/30 absolute top-1/2 left-0 transform -translate-y-1/2 rotate-[135deg]"></div>
-            </div>
-            <div className="absolute top-0 left-1/2 w-1 h-1 bg-red-500 transform -translate-x-1/2 translate-y-2 z-10"></div>
-            <div className="absolute bottom-0 left-1/2 w-1 h-1 bg-blue-500 transform -translate-x-1/2 -translate-y-2 z-10"></div>
-            <div className="absolute top-1/2 left-0 w-1 h-1 bg-gray-700 transform -translate-y-1/2 translate-x-2 z-10"></div>
-            <div className="absolute top-1/2 right-0 w-1 h-1 bg-gray-700 transform -translate-y-1/2 -translate-x-2 z-10"></div>
-            
-            {/* Direction letters */}
-            <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-red-600">N</div>
-            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-blue-600">S</div>
-            <div className="absolute top-1/2 left-1 transform -translate-y-1/2 text-[10px] font-bold text-gray-700">W</div>
-            <div className="absolute top-1/2 right-1 transform -translate-y-1/2 text-[10px] font-bold text-gray-700">E</div>
-            
-            <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-gray-800 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20"></div>
-          </div>
-        </div>
-        
-        {/* Map scale indicator */}
+        {/* Map scale indicator and legend */}
         <div className="absolute bottom-6 right-6 bg-white/90 px-3 py-2 rounded-lg shadow-lg text-xs font-medium border border-gray-200">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-3 h-3 rounded-sm border border-gray-300 grid place-items-center">
@@ -420,6 +423,32 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           <div className="flex items-center gap-2 mt-1">
             <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
             <span>Your location</span>
+          </div>
+        </div>
+        
+        {/* Enhanced compass rose decoration */}
+        <div className="absolute bottom-6 left-6 h-16 w-16 opacity-80">
+          <div className="relative h-full w-full">
+            <div className="absolute h-full w-full rounded-full border-2 border-gray-700/30 bg-white/60 backdrop-blur-sm shadow-inner"></div>
+            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-700/50 transform -translate-y-1/2"></div>
+            <div className="absolute top-0 left-1/2 h-full w-0.5 bg-gray-700/50 transform -translate-x-1/2"></div>
+            {/* Diagonal lines */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="w-full h-0.5 bg-gray-700/30 absolute top-1/2 left-0 transform -translate-y-1/2 rotate-45"></div>
+              <div className="w-full h-0.5 bg-gray-700/30 absolute top-1/2 left-0 transform -translate-y-1/2 rotate-[135deg]"></div>
+            </div>
+            <div className="absolute top-0 left-1/2 w-1 h-1 bg-red-500 transform -translate-x-1/2 translate-y-2 z-10"></div>
+            <div className="absolute bottom-0 left-1/2 w-1 h-1 bg-blue-500 transform -translate-x-1/2 -translate-y-2 z-10"></div>
+            <div className="absolute top-1/2 left-0 w-1 h-1 bg-gray-700 transform -translate-y-1/2 translate-x-2 z-10"></div>
+            <div className="absolute top-1/2 right-0 w-1 h-1 bg-gray-700 transform -translate-y-1/2 -translate-x-2 z-10"></div>
+            
+            {/* Direction letters */}
+            <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-red-600">N</div>
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-blue-600">S</div>
+            <div className="absolute top-1/2 left-1 transform -translate-y-1/2 text-[10px] font-bold text-gray-700">W</div>
+            <div className="absolute top-1/2 right-1 transform -translate-y-1/2 text-[10px] font-bold text-gray-700">E</div>
+            
+            <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-gray-800 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20"></div>
           </div>
         </div>
       </div>

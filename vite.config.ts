@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -10,7 +11,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Enable Fast Refresh for better development experience
+      fastRefresh: true
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -18,5 +22,38 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // Optimize build output
+  build: {
+    // Improve chunk size
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Split code by module for better caching
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@/components/ui'],
+          chart: ['recharts']
+        }
+      }
+    },
+    // Enable minification and tree-shaking
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs in production
+        drop_debugger: true
+      }
+    },
+    // Generate sourcemaps for debugging
+    sourcemap: mode === 'development'
+  },
+  // Optimize dev server
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'recharts', '@tanstack/react-query'],
+  },
+  // Enable CSS code splitting
+  css: {
+    devSourcemap: true,
   },
 }));
