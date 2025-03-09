@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, User, Briefcase, Building, Heart, CheckCircle, Calendar, MapPin } from "lucide-react";
@@ -19,7 +18,6 @@ const RupeeIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-indian-rupee"
   >
     <path d="M6 3h12" />
     <path d="M6 8h12" />
