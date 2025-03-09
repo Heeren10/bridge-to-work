@@ -51,15 +51,16 @@ const SearchFilter = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="input-field w-full pl-10 pr-10 shadow-sm"
+            className="input-field w-full py-3 px-12 text-base"
+            style={{ minHeight: "44px" }}
           />
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
             <Search size={18} />
           </div>
           {searchQuery && (
             <button 
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
               aria-label="Clear search"
             >
               <X size={16} />

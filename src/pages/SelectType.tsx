@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, User, Briefcase, Building, Heart, CheckCircle, Calendar, MapPin } from "lucide-react";
@@ -171,7 +172,7 @@ const SelectType = () => {
             
             <div className="flex items-start">
               <div className="p-2 bg-green-100 rounded-full mr-3">
-                <RupeeIcon className="text-green-600" />
+                <RupeeIcon />
               </div>
               <div>
                 <h3 className="font-medium mb-1">Dignity First</h3>
