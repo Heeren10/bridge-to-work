@@ -12,6 +12,7 @@ export interface JobData {
   duration: string;
   skills: string[];
   date: string;
+  localArea?: string; // Added local area property
 }
 
 interface JobCardProps {
@@ -47,6 +48,18 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
   // Format salary to always use ₹ symbol
   const formattedSalary = job.salary.startsWith('₹') ? job.salary : `₹${job.salary.replace(/[^\d]/g, '')}`;
 
+  // Get location and local area display
+  const locationDisplay = job.localArea 
+    ? (
+      <div className="flex flex-col">
+        <span>{job.location}</span>
+        <span className="text-xs text-primary-600 font-medium">
+          {job.localArea}
+        </span>
+      </div>
+    ) 
+    : <span>{job.location}</span>;
+
   return (
     <div 
       className="glass-card rounded-xl overflow-hidden card-hover transition-all duration-300 border-l-4 border-l-primary"
@@ -70,7 +83,7 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
         <div className="grid grid-cols-2 gap-2 mt-3">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin size={14} className="text-rose-500" />
-            <span>{job.location}</span>
+            {locationDisplay}
           </div>
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock size={14} className="text-blue-500" />

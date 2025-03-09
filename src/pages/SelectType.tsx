@@ -1,11 +1,33 @@
 
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, User, Briefcase, Building, Heart, CheckCircle, Calendar, MapPin, DollarSign } from "lucide-react";
+import { ArrowRight, User, Briefcase, Building, Heart, CheckCircle, Calendar, MapPin } from "lucide-react";
 import Header from "../components/Header";
 import BackButton from "../components/BackButton";
 import WelcomePrompt from "../components/WelcomePrompt";
 import { AppContext } from "../App";
+
+// Custom icon for rupees
+const RupeeIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-indian-rupee"
+  >
+    <path d="M6 3h12" />
+    <path d="M6 8h12" />
+    <path d="m6 13 8.5 8" />
+    <path d="M6 13h3" />
+    <path d="M9 13c6.667 0 6.667-10 0-10" />
+  </svg>
+);
 
 interface UserTypeCardProps {
   icon: React.ReactNode;
@@ -151,7 +173,7 @@ const SelectType = () => {
             
             <div className="flex items-start">
               <div className="p-2 bg-green-100 rounded-full mr-3">
-                <DollarSign size={20} className="text-green-600" />
+                <RupeeIcon className="text-green-600" />
               </div>
               <div>
                 <h3 className="font-medium mb-1">Dignity First</h3>

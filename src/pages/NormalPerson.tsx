@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, Building, MapPin } from "lucide-react";
@@ -17,6 +18,7 @@ const JOBS_DATA: JobData[] = [
     description: "Help with basic gardening tasks including weeding, planting, and watering. No experience necessary, tools and guidance provided.",
     company: "Green City Initiative",
     location: "Mumbai",
+    localArea: "Colaba",
     salary: "₹1,200/hour",
     duration: "1-2 days",
     skills: ["Physical work", "Outdoors"],
@@ -28,6 +30,7 @@ const JOBS_DATA: JobData[] = [
     description: "Assist in food preparation, cleaning, and serving in a busy community kitchen. Flexible hours, meals provided.",
     company: "Community Eats",
     location: "Delhi",
+    localArea: "Connaught Place",
     salary: "₹1,000/hour",
     duration: "Ongoing",
     skills: ["Food prep", "Cleaning"],
@@ -39,6 +42,7 @@ const JOBS_DATA: JobData[] = [
     description: "Help with loading and unloading furniture and boxes. One-time opportunity with immediate payment.",
     company: "QuickMove Services",
     location: "Bangalore",
+    localArea: "Indiranagar",
     salary: "₹8,000/day",
     duration: "1 day",
     skills: ["Heavy lifting", "Attention to detail"],
@@ -50,6 +54,7 @@ const JOBS_DATA: JobData[] = [
     description: "Join a team cleaning up the neighborhood streets. Equipment provided, no experience needed.",
     company: "Clean Streets Program",
     location: "Hyderabad",
+    localArea: "Banjara Hills",
     salary: "₹900/hour",
     duration: "Weekly",
     skills: ["Outdoors", "Community minded"],
