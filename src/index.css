@@ -5,74 +5,65 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 210 100% 50%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 216 100% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 100% 50%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
 
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5% 26%;
-    --sidebar-primary: 240 6% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217 91% 60%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 11%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217 33% 18%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217 33% 18%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 213 27% 84%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
   }
 }
 
@@ -80,116 +71,9 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
-}
-
-@layer components {
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-sm border border-white/30 shadow-md;
-  }
-  
-  .btn-primary {
-    @apply px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px];
-  }
-  
-  .btn-secondary {
-    @apply px-6 py-3 bg-secondary text-secondary-foreground rounded-lg font-medium transition-all duration-300 hover:shadow-sm hover:bg-secondary/80;
-  }
-  
-  .input-field {
-    @apply px-4 py-3 rounded-lg border border-border bg-white focus:outline-none focus:ring-2 focus:ring-ring;
-  }
-  
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px];
-  }
-  
-  .heading-1 {
-    @apply text-4xl font-bold tracking-tight;
-  }
-  
-  .heading-2 {
-    @apply text-3xl font-bold tracking-tight;
-  }
-  
-  .heading-3 {
-    @apply text-2xl font-bold tracking-tight;
-  }
-  
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .container-padding {
-    @apply px-4 py-6 md:px-6 md:py-8;
-  }
-  
-  /* New colorful UI elements */
-  .text-gradient-primary {
-    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
-  }
-  
-  .card-gradient-blue {
-    @apply bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200;
-  }
-  
-  .card-gradient-green {
-    @apply bg-gradient-to-br from-green-50 to-green-100 border border-green-200;
-  }
-  
-  .card-gradient-amber {
-    @apply bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200;
-  }
-  
-  .card-gradient-rose {
-    @apply bg-gradient-to-br from-rose-50 to-rose-100 border border-rose-200;
-  }
-  
-  .map-pin {
-    @apply transition-all duration-300 hover:scale-110 hover:z-30;
-  }
-  
-  .map-pin-pulse::before {
-    content: '';
-    @apply absolute inset-0 rounded-full animate-ping;
-    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-}
-
-/* Enhanced animations */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.05);
-  }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s ease-in-out infinite;
 }
 
 @keyframes fade-in {
@@ -201,21 +85,49 @@
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateY(20px);
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.7);
     opacity: 0;
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+  100% {
+    transform: scale(1);
+    opacity: 0;
   }
 }
 
-.animate-slide-in {
-  animation: slide-in 0.4s ease-out;
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
