@@ -67,6 +67,8 @@ export default {
       animation: {
         "ping-slow": "ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite",
         "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "slide-in": "slide-in 0.5s ease-out forwards",
+        "float": "float 3s ease-in-out infinite",
       },
       keyframes: {
         "ping-slow": {
@@ -77,6 +79,14 @@ export default {
         "pulse-subtle": {
           "0%, 100%": { opacity: "0.3" },
           "50%": { opacity: "0.7" }
+        },
+        "slide-in": {
+          "from": { transform: "translateY(20px)", opacity: "0" },
+          "to": { transform: "translateY(0)", opacity: "1" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" }
         }
       }
     },

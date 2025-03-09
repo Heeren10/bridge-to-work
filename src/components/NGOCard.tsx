@@ -1,5 +1,5 @@
 
-import { MapPin, Phone, ExternalLink } from "lucide-react";
+import { MapPin, Phone, ExternalLink, Heart } from "lucide-react";
 import { useState } from "react";
 
 export interface NGOData {
@@ -23,21 +23,26 @@ const NGOCard = ({ ngo, onRefer }: NGOCardProps) => {
 
   return (
     <div 
-      className="glass-card rounded-xl overflow-hidden card-hover"
+      className="glass-card rounded-xl overflow-hidden card-hover transition-all duration-300 border-l-4 border-l-rose-400"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="p-4">
         <div className="flex justify-between items-start">
-          <h3 className="font-semibold text-lg">{ngo.name}</h3>
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-br from-rose-400 to-rose-500 rounded-full shadow-sm">
+              <Heart size={16} className="text-white" />
+            </div>
+            <h3 className="font-semibold text-lg">{ngo.name}</h3>
+          </div>
         </div>
         
-        <div className="flex flex-col gap-2 mt-3">
+        <div className="flex flex-col gap-2 mt-3 ml-10">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin size={14} />
+            <MapPin size={14} className="text-rose-500" />
             <span>{ngo.address}</span>
           </div>
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Phone size={14} />
+            <Phone size={14} className="text-blue-500" />
             <span>{ngo.phone}</span>
           </div>
         </div>
@@ -50,7 +55,7 @@ const NGOCard = ({ ngo, onRefer }: NGOCardProps) => {
               {ngo.services.map((service, index) => (
                 <span 
                   key={index} 
-                  className="px-2 py-0.5 bg-accent text-xs rounded-full"
+                  className="px-2 py-0.5 bg-gradient-to-r from-rose-100 to-rose-50 text-xs rounded-full text-rose-700 font-medium"
                 >
                   {service}
                 </span>
@@ -71,7 +76,7 @@ const NGOCard = ({ ngo, onRefer }: NGOCardProps) => {
               )}
               {onRefer && (
                 <button 
-                  className="ml-auto py-1.5 px-3 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
+                  className="ml-auto py-1.5 px-3 text-sm font-medium text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRefer(ngo);

@@ -55,12 +55,12 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
       <div className="p-4">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-gradient-to-br from-primary to-primary/80 rounded-full">
+            <div className="p-2 bg-gradient-to-br from-primary to-blue-500 rounded-full shadow-sm">
               <Briefcase size={16} className="text-white" />
             </div>
             <h3 className="font-semibold text-lg">{job.title}</h3>
           </div>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-amber-100 to-amber-50 text-amber-800 rounded-full shadow-sm">
             <Calendar size={12} />
             <span className="text-xs font-medium">{job.date}</span>
           </div>
@@ -89,7 +89,7 @@ const JobCard = ({ job, onRefer }: JobCardProps) => {
               {job.skills.map((skill, index) => (
                 <span 
                   key={index} 
-                  className="px-2.5 py-0.5 bg-gradient-to-r from-primary/10 to-primary/20 text-primary text-xs rounded-full font-medium"
+                  className="px-2.5 py-0.5 bg-gradient-to-r from-primary/10 to-blue-400/20 text-primary text-xs rounded-full font-medium"
                 >
                   {skill}
                 </span>

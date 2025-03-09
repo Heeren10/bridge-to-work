@@ -51,7 +51,7 @@ const SearchFilter = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="input-field w-full pl-10 pr-10"
+            className="input-field w-full pl-10 pr-10 shadow-sm"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary" size={18} />
           {searchQuery && (
@@ -65,23 +65,23 @@ const SearchFilter = ({
         </div>
         <button 
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className={`p-3 rounded-lg border ${isFilterOpen ? 'bg-accent border-primary/30' : 'border-border'} transition-colors`}
+          className={`p-3 rounded-lg ${isFilterOpen ? 'bg-primary/10 border-primary/30 text-primary' : 'border border-border text-muted-foreground'} transition-colors shadow-sm`}
           aria-label="Filter"
         >
-          <Filter size={20} className={isFilterOpen ? 'text-primary' : 'text-muted-foreground'} />
+          <Filter size={20} />
         </button>
       </div>
 
       {isFilterOpen && (
-        <div className="flex flex-wrap gap-2 p-3 bg-accent rounded-lg animate-fade-in">
+        <div className="flex flex-wrap gap-2 p-3 bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg animate-fade-in shadow-sm">
           {filterOptions.map(option => (
             <button
               key={option.id}
               onClick={() => handleFilterToggle(option.id)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 selectedFilters[option.id] 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-white border border-border hover:bg-secondary'
+                  ? 'bg-gradient-to-r from-primary to-blue-500 text-white shadow-sm' 
+                  : 'bg-white border border-border hover:border-primary/30 hover:bg-primary/5 shadow-sm'
               }`}
             >
               {option.label}

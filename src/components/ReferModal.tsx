@@ -1,5 +1,5 @@
 
-import { X } from "lucide-react";
+import { X, Share2, Copy, MessageSquare } from "lucide-react";
 import { useState } from "react";
 
 interface ReferModalProps {
@@ -57,7 +57,7 @@ const ReferModal = ({ item, type, onClose }: ReferModalProps) => {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
       <div className="bg-white rounded-xl max-w-md w-full shadow-xl animate-slide-in overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-slate-50 to-blue-50">
           <h2 className="text-lg font-semibold">Refer {type === "job" ? "Opportunity" : "Service"}</h2>
           <button 
             onClick={onClose}
@@ -68,7 +68,7 @@ const ReferModal = ({ item, type, onClose }: ReferModalProps) => {
         </div>
         
         <div className="p-4">
-          <div className="mb-4">
+          <div className="mb-4 p-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg">
             <h3 className="font-medium text-lg">{itemDetails.title}</h3>
             <p className="text-muted-foreground">{itemDetails.organization}</p>
             <p className="text-sm">{itemDetails.details}</p>
@@ -77,16 +77,18 @@ const ReferModal = ({ item, type, onClose }: ReferModalProps) => {
           <div className="space-y-4">
             <button
               onClick={handleShare}
-              className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium"
+              className="w-full py-2.5 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg font-medium shadow-sm hover:from-primary/90 hover:to-blue-700 transition-colors"
             >
-              Share
+              <Share2 size={16} />
+              <span>Share</span>
             </button>
             
             <button
               onClick={handleCopy}
-              className="w-full py-2.5 border border-input rounded-lg font-medium hover:bg-muted/50 transition-colors"
+              className="w-full py-2.5 flex items-center justify-center gap-2 border border-input rounded-lg font-medium bg-secondary hover:bg-secondary/70 transition-colors"
             >
-              {copied ? "Copied!" : "Copy to Clipboard"}
+              <Copy size={16} />
+              <span>{copied ? "Copied!" : "Copy to Clipboard"}</span>
             </button>
             
             <div className="relative">
@@ -109,9 +111,10 @@ const ReferModal = ({ item, type, onClose }: ReferModalProps) => {
               />
               <button
                 type="submit"
-                className="w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/80 transition-colors"
+                className="w-full py-2.5 flex items-center justify-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-lg font-medium hover:from-slate-800 hover:to-slate-900 transition-colors"
               >
-                {sent ? "Sent!" : "Send SMS"}
+                <MessageSquare size={16} />
+                <span>{sent ? "Sent!" : "Send SMS"}</span>
               </button>
             </form>
           </div>
