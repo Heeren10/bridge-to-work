@@ -98,6 +98,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<{item: JobData | NGOData, type: "job" | "ngo"} | null>(null);
   const [showRoute, setShowRoute] = useState(false);
+  const infoCardRef = useRef<HTMLDivElement>(null);
   
   // Find the currently selected city
   const currentCity = INDIAN_CITIES.find(city => city.name === selectedCity) || INDIAN_CITIES[0];
@@ -166,8 +167,6 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
 
   // Function to handle neighborhood click to show items in that area
   const handleNeighborhoodClick = (neighborhood: { name: string }) => {
-    console.log(`Neighborhood clicked: ${neighborhood.name}`);
-    
     // Find items in this neighborhood
     const itemsInArea = itemPositions.filter(pos => {
       const isJob = pos.isJob;
@@ -177,8 +176,6 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
       
       return locationText.includes(neighborhood.name);
     });
-    
-    console.log(`Found ${itemsInArea.length} items in ${neighborhood.name}`);
     
     if (itemsInArea.length > 0) {
       // Select the first item in this neighborhood
@@ -196,6 +193,29 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
     setSelectedItem(null);
     setShowRoute(false);
   };
+
+  // Handle click outside of the infoCard to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (infoCardRef.current && !infoCardRef.current.contains(event.target as Node)) {
+        // Only close if clicking on the map area and not on any interactive elements
+        const clickedElement = event.target as HTMLElement;
+        const isInteractiveElement = 
+          clickedElement.closest('button') || 
+          clickedElement.closest('.neighborhood-area') ||
+          clickedElement.closest('.map-marker');
+        
+        if (!isInteractiveElement) {
+          closeSelectedItem();
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Get user position (fixed for demo)
   const userPosition = { top: 75, left: 45 };
@@ -333,7 +353,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           {currentCity.neighborhoods.map((neighborhood, index) => (
             <div 
               key={`neighborhood-${index}`}
-              className="absolute cursor-pointer hover:z-50"
+              className="absolute cursor-pointer hover:z-50 neighborhood-area"
               style={{ 
                 top: `${neighborhood.top}%`, 
                 left: `${neighborhood.left}%`,
@@ -442,7 +462,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
             return (
               <div 
                 key={`marker-${index}`}
-                className={`absolute cursor-pointer ${isSelected ? 'z-50' : ''}`}
+                className={`absolute cursor-pointer map-marker ${isSelected ? 'z-50' : ''}`}
                 style={{ 
                   top: `${pos.top}%`, 
                   left: `${pos.left}%`,
@@ -485,6 +505,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         {/* Selected item details card */}
         {selectedItem && (
           <div 
+            ref={infoCardRef}
             className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-lg shadow-xl border border-blue-100 animate-slide-in z-50"
           >
             <div className="p-4">
