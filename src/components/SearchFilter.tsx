@@ -46,17 +46,17 @@ const SearchFilter = ({
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
+            <Search size={18} />
+          </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="input-field w-full py-3 px-12 text-base"
-            style={{ minHeight: "44px" }}
+            className="w-full py-3 rounded-lg border border-border bg-white/80 focus:border-primary/30 focus:ring-2 focus:ring-primary/10 outline-none transition-all duration-200 pl-10 pr-10"
+            style={{ minHeight: "46px", fontSize: "16px" }}
           />
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
-            <Search size={18} />
-          </div>
           {searchQuery && (
             <button 
               onClick={clearSearch}
