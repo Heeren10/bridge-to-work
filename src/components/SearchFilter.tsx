@@ -46,7 +46,7 @@ const SearchFilter = ({
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none z-10">
             <Search size={18} />
           </div>
           <input
@@ -54,13 +54,13 @@ const SearchFilter = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="w-full py-3 rounded-lg border border-border bg-white/80 focus:border-primary/30 focus:ring-2 focus:ring-primary/10 outline-none transition-all duration-200 pl-10 pr-10"
+            className="w-full py-3 rounded-lg border border-border bg-white/80 focus:border-primary/30 focus:ring-2 focus:ring-primary/10 outline-none transition-all duration-200 pl-12 pr-12"
             style={{ minHeight: "46px", fontSize: "16px" }}
           />
           {searchQuery && (
             <button 
               onClick={clearSearch}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"
               aria-label="Clear search"
             >
               <X size={16} />

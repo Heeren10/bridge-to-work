@@ -1,7 +1,8 @@
+
 import { useEffect, useRef, useState } from "react";
 import { JobData } from "./JobCard";
 import { NGOData } from "./NGOCard";
-import { MapPin, Navigation, Compass, ArrowUpRight, Search, Map, Layers, Plus, Minus } from "lucide-react";
+import { MapPin, Navigation, Compass, ArrowUpRight, Search, Map, Layers, Plus, Minus, Route } from "lucide-react";
 
 interface MapViewProps {
   jobs: JobData[];
@@ -95,6 +96,8 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   const [selectedCity, setSelectedCity] = useState("Mumbai");
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{item: JobData | NGOData, type: "job" | "ngo"} | null>(null);
+  const [showRoute, setShowRoute] = useState(false);
   
   // Find the currently selected city
   const currentCity = INDIAN_CITIES.find(city => city.name === selectedCity) || INDIAN_CITIES[0];
@@ -147,6 +150,29 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
       setZoomLevel(prev => prev - 0.5);
     }
   };
+
+  // Function to handle item selection
+  const handleItemClick = (itemPos: {item: JobData | NGOData, isJob: boolean}) => {
+    setSelectedItem({
+      item: itemPos.item,
+      type: itemPos.isJob ? "job" : "ngo"
+    });
+    setShowRoute(false); // Reset route visibility
+  };
+
+  // Function to toggle route display
+  const toggleRoute = () => {
+    setShowRoute(!showRoute);
+  };
+
+  // Function to close selected item
+  const closeSelectedItem = () => {
+    setSelectedItem(null);
+    setShowRoute(false);
+  };
+
+  // Get user position (fixed for demo)
+  const userPosition = { top: 75, left: 45 };
 
   return (
     <div className="rounded-xl overflow-hidden h-full relative shadow-xl border border-blue-200/50 bg-[#F1F0FB]">
@@ -228,7 +254,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
               ? `url('${currentCity.mapImage}')` 
               : mapView === 'satellite' 
                 ? "url('/lovable-uploads/165c8b71-2cca-4b61-99b2-3c5414e1c0ec.png')" 
-                : "linear-gradient(to bottom, #f0f8ff, #ffffff)",
+                : "linear-gradient to bottom, #f0f8ff, #ffffff",
             backgroundSize: "cover",
             backgroundPosition: "center",
             transform: `scale(${zoomLevel})`,
@@ -316,6 +342,57 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           ))}
         </div>
         
+        {/* Route between user and selected item */}
+        {selectedItem && showRoute && (
+          <div className="absolute inset-0 z-25 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              {itemPositions.map((pos, idx) => {
+                if (
+                  (selectedItem.type === "job" && pos.isJob && (pos.item as JobData).id === (selectedItem.item as JobData).id) ||
+                  (selectedItem.type === "ngo" && !pos.isJob && (pos.item as NGOData).id === (selectedItem.item as NGOData).id)
+                ) {
+                  // Draw route between user position and this item
+                  return (
+                    <g key={`route-${idx}`}>
+                      <path 
+                        d={`M${userPosition.left}%,${userPosition.top}% C${userPosition.left+10}%,${userPosition.top-10}% ${pos.left-10}%,${pos.top+10}% ${pos.left}%,${pos.top}%`}
+                        stroke="#4338ca" 
+                        strokeWidth="2" 
+                        strokeDasharray="5,5"
+                        fill="none"
+                      />
+                      {/* Route markers */}
+                      <circle cx={`${userPosition.left}%`} cy={`${userPosition.top}%`} r="3" fill="#4338ca" />
+                      <circle cx={`${pos.left}%`} cy={`${pos.top}%`} r="3" fill="#4338ca" />
+                      
+                      {/* Distance markers */}
+                      <circle 
+                        cx={`${(userPosition.left + pos.left) / 2}%`} 
+                        cy={`${(userPosition.top + pos.top) / 2 - 5}%`} 
+                        r="6" 
+                        fill="white" 
+                        stroke="#4338ca"
+                      />
+                      <text 
+                        x={`${(userPosition.left + pos.left) / 2}%`} 
+                        y={`${(userPosition.top + pos.top) / 2 - 5}%`} 
+                        textAnchor="middle" 
+                        dominantBaseline="middle"
+                        fontSize="10"
+                        fill="#4338ca"
+                        fontWeight="bold"
+                      >
+                        {Math.floor(Math.random() * 5) + 2}km
+                      </text>
+                    </g>
+                  );
+                }
+                return null;
+              })}
+            </svg>
+          </div>
+        )}
+        
         {/* Job/Service markers */}
         <div className="absolute inset-0 z-30">
           {itemPositions.map((pos, index) => {
@@ -329,10 +406,16 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
               ? "bg-blue-500" 
               : "bg-rose-500";
             
+            // Check if this item is the selected one
+            const isSelected = selectedItem && (
+              (selectedItem.type === "job" && isJob && (selectedItem.item as JobData).id === (item as JobData).id) ||
+              (selectedItem.type === "ngo" && !isJob && (selectedItem.item as NGOData).id === (item as NGOData).id)
+            );
+            
             return (
               <div 
                 key={`marker-${index}`}
-                className="absolute cursor-pointer"
+                className={`absolute cursor-pointer ${isSelected ? 'z-50' : ''}`}
                 style={{ 
                   top: `${pos.top}%`, 
                   left: `${pos.left}%`,
@@ -340,34 +423,133 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
                 }}
                 onMouseEnter={() => setHoveredLocation(label)}
                 onMouseLeave={() => setHoveredLocation(null)}
+                onClick={() => handleItemClick(pos)}
               >
                 {/* Marker */}
                 <div className="relative group">
-                  <div className={`w-4 h-4 ${markerBgClass} rounded-full flex items-center justify-center shadow-md`}>
+                  <div className={`w-4 h-4 ${isSelected ? 'w-6 h-6 ring-4 ring-white' : ''} ${markerBgClass} rounded-full flex items-center justify-center shadow-md transition-all`}>
                     {isJob ? (
-                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                      <div className={`${isSelected ? 'w-2.5 h-2.5' : 'w-1.5 h-1.5'} bg-white rounded-full`} />
                     ) : (
-                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                      <div className={`${isSelected ? 'w-2.5 h-2.5' : 'w-1.5 h-1.5'} bg-white rounded-full`} />
                     )}
                   </div>
                   
                   {/* Pulse animation */}
                   <div className={`absolute inset-0 rounded-full animate-ping-slow opacity-70 ${isJob ? 'bg-blue-400' : 'bg-rose-400'}`} />
                   
-                  {/* Info tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-white rounded-md shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-40 text-left border border-gray-200">
-                    <div className="font-bold text-xs truncate">{label}</div>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{isJob ? (item as JobData).location : (item as NGOData).address}</p>
-                    <p className="text-xs truncate mt-1">{details}</p>
-                    {isJob && (
-                      <p className="text-green-600 font-medium text-xs mt-1">{(item as JobData).salary}</p>
-                    )}
-                  </div>
+                  {/* Info tooltip on hover */}
+                  {!isSelected && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-white rounded-md shadow-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-40 text-left border border-gray-200">
+                      <div className="font-bold text-xs truncate">{label}</div>
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{isJob ? (item as JobData).location : (item as NGOData).address}</p>
+                      <p className="text-xs truncate mt-1">{details}</p>
+                      {isJob && (
+                        <p className="text-green-600 font-medium text-xs mt-1">{(item as JobData).salary}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+        
+        {/* Selected item details card */}
+        {selectedItem && (
+          <div 
+            className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-lg shadow-xl border border-blue-100 animate-slide-in z-50"
+          >
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="font-bold text-lg">
+                    {selectedItem.type === "job" 
+                      ? (selectedItem.item as JobData).title 
+                      : (selectedItem.item as NGOData).name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedItem.type === "job" 
+                      ? (selectedItem.item as JobData).company 
+                      : (selectedItem.item as NGOData).services.join(', ')}
+                  </p>
+                </div>
+                <button 
+                  onClick={closeSelectedItem}
+                  className="p-1 hover:bg-gray-100 rounded-full"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-1.5 text-sm mt-2">
+                <MapPin size={14} className="text-rose-500" />
+                <span>
+                  {selectedItem.type === "job" 
+                    ? (selectedItem.item as JobData).location 
+                    : (selectedItem.item as NGOData).address}
+                </span>
+              </div>
+              
+              {selectedItem.type === "job" && (
+                <>
+                  <div className="flex items-center gap-1.5 text-sm mt-1.5 text-green-700 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-indian-rupee">
+                      <path d="M6 3h12" />
+                      <path d="M6 8h12" />
+                      <path d="m6 13 8.5 8" />
+                      <path d="M6 13h3" />
+                      <path d="M9 13c6.667 0 6.667-10 0-10" />
+                    </svg>
+                    <span>{(selectedItem.item as JobData).salary}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm mt-1.5">
+                    <Clock size={14} className="text-blue-500" />
+                    <span>{(selectedItem.item as JobData).duration}</span>
+                  </div>
+                </>
+              )}
+              
+              <p className="text-sm mt-3">
+                {selectedItem.type === "job" 
+                  ? (selectedItem.item as JobData).description 
+                  : (selectedItem.item as NGOData).description}
+              </p>
+              
+              {selectedItem.type === "job" && (
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {(selectedItem.item as JobData).skills.map((skill, idx) => (
+                    <span 
+                      key={idx}
+                      className="px-2 py-0.5 bg-blue-50 text-primary text-xs rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <button
+                  onClick={toggleRoute}
+                  className={`py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 
+                    ${showRoute 
+                      ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' 
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                >
+                  <Route size={16} />
+                  {showRoute ? 'Hide Route' : 'Show Route'}
+                </button>
+                <button
+                  className="py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 flex items-center justify-center gap-1.5"
+                >
+                  <Navigation size={16} />
+                  Get Directions
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* User location indicator */}
         <div 
