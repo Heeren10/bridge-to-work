@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { JobData } from "./JobCard";
 import { NGOData } from "./NGOCard";
@@ -104,7 +105,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   // Filter items based on selected city
   const filteredItems = activeType === "jobs" 
     ? jobs.filter(job => job.location.includes(currentCity.name) || 
-        currentCity.neighborhoods.some(n => job.location.includes(n.name)))
+        currentCity.neighborhoods.some(n => job.localArea?.includes(n.name) || job.location.includes(n.name)))
     : ngos.filter(ngo => ngo.address.includes(currentCity.name) || 
         currentCity.neighborhoods.some(n => ngo.address.includes(n.name)));
 
@@ -112,7 +113,9 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
   const getItemPositions = () => {
     return filteredItems.map(item => {
       const isJob = activeType === "jobs";
-      const locationText = isJob ? (item as JobData).location : (item as NGOData).address;
+      const locationText = isJob 
+        ? (item as JobData).localArea || (item as JobData).location 
+        : (item as NGOData).address;
       
       // Try to find matching neighborhood
       const neighborhoodMatch = currentCity.neighborhoods.find(n => 
@@ -124,7 +127,8 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           item,
           top: neighborhoodMatch.top,
           left: neighborhoodMatch.left,
-          isJob
+          isJob,
+          neighborhoodName: neighborhoodMatch.name
         };
       }
       
@@ -134,7 +138,8 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         item,
         top: currentCity.top + (Math.random() * variance - variance/2),
         left: currentCity.left + (Math.random() * variance - variance/2),
-        isJob
+        isJob,
+        neighborhoodName: null
       };
     });
   };
@@ -156,20 +161,24 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
       item: itemPos.item,
       type: itemPos.isJob ? "job" : "ngo"
     });
-    setShowRoute(false); // Reset route visibility
+    setShowRoute(true); // Show route automatically when item is selected
   };
 
   // Function to handle neighborhood click to show items in that area
   const handleNeighborhoodClick = (neighborhood: { name: string }) => {
+    console.log(`Neighborhood clicked: ${neighborhood.name}`);
+    
     // Find items in this neighborhood
     const itemsInArea = itemPositions.filter(pos => {
       const isJob = pos.isJob;
       const locationText = isJob 
-        ? (pos.item as JobData).location 
+        ? (pos.item as JobData).localArea || (pos.item as JobData).location 
         : (pos.item as NGOData).address;
       
       return locationText.includes(neighborhood.name);
     });
+    
+    console.log(`Found ${itemsInArea.length} items in ${neighborhood.name}`);
     
     if (itemsInArea.length > 0) {
       // Select the first item in this neighborhood
@@ -324,7 +333,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
           {currentCity.neighborhoods.map((neighborhood, index) => (
             <div 
               key={`neighborhood-${index}`}
-              className="absolute cursor-pointer"
+              className="absolute cursor-pointer hover:z-50"
               style={{ 
                 top: `${neighborhood.top}%`, 
                 left: `${neighborhood.left}%`,
@@ -350,7 +359,7 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
                 
                 {/* Area highlight */}
                 <div 
-                  className="w-16 h-16 rounded-full border-2 border-dashed border-primary/50 opacity-30"
+                  className="w-16 h-16 rounded-full border-2 border-dashed border-primary/50 opacity-30 hover:opacity-70 hover:border-primary hover:bg-primary/10 transition-all"
                   style={{
                     background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 70%)'
                   }}
