@@ -1,8 +1,7 @@
-
 import { useEffect, useRef, useState } from "react";
 import { JobData } from "./JobCard";
 import { NGOData } from "./NGOCard";
-import { MapPin, Navigation, Compass, ArrowUpRight, Search, Map, Layers, Plus, Minus, Route } from "lucide-react";
+import { MapPin, Navigation, Compass, ArrowUpRight, Search, Map, Layers, Plus, Minus, Route, X, Clock } from "lucide-react";
 
 interface MapViewProps {
   jobs: JobData[];
@@ -160,6 +159,24 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
     setShowRoute(false); // Reset route visibility
   };
 
+  // Function to handle neighborhood click to show items in that area
+  const handleNeighborhoodClick = (neighborhood: { name: string }) => {
+    // Find items in this neighborhood
+    const itemsInArea = itemPositions.filter(pos => {
+      const isJob = pos.isJob;
+      const locationText = isJob 
+        ? (pos.item as JobData).location 
+        : (pos.item as NGOData).address;
+      
+      return locationText.includes(neighborhood.name);
+    });
+    
+    if (itemsInArea.length > 0) {
+      // Select the first item in this neighborhood
+      handleItemClick(itemsInArea[0]);
+    }
+  };
+
   // Function to toggle route display
   const toggleRoute = () => {
     setShowRoute(!showRoute);
@@ -303,16 +320,17 @@ const MapView = ({ jobs, ngos, activeType }: MapViewProps) => {
         )}
         
         {/* Neighborhoods */}
-        <div className="absolute inset-0 z-20 pointer-events-none">
+        <div className="absolute inset-0 z-20">
           {currentCity.neighborhoods.map((neighborhood, index) => (
             <div 
               key={`neighborhood-${index}`}
-              className="absolute"
+              className="absolute cursor-pointer"
               style={{ 
                 top: `${neighborhood.top}%`, 
                 left: `${neighborhood.left}%`,
                 transform: 'translate(-50%, -50%)'
               }}
+              onClick={() => handleNeighborhoodClick(neighborhood)}
             >
               <div className="relative">
                 {/* Only show label in street or standard view */}
